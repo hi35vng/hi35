@@ -5,3 +5,4 @@ http://nemon.org/ipcam-ipr1631x/#SDK
 https://github.com/xuhuashan/hi3518-osdrv
 https://github.com/astroza/hi3518_env
 https://github.com/lukier
+http://nemon.org/ipcam-ipr1631x/
