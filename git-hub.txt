@@ -1,0 +1,7 @@
+https://github.com/lukier/linux-hi3518
+http://felipe.astroza.cl/hacking-hi3518-based-ip-camera/
+http://nemon.org/ipcam-ipr1631x/
+http://nemon.org/ipcam-ipr1631x/#SDK
+https://github.com/xuhuashan/hi3518-osdrv
+https://github.com/astroza/hi3518_env
+https://github.com/lukier

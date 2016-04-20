@@ -1,0 +1,99 @@
+Hi3518 SDK installation and upgrade instructions for use
+The first chapter Hi3518_SDK_Vx.x.x.x version upgrade instructions
+
+The first time you install the SDK, please see Chapter 2 directly.
+
+The second chapter is first installed SDK
+
+Hi3518 SDK package location
+
+In Hi3518_V100R001SPC *** / 01.software/board directory, you can see a Hi3518_SDK_Vx.x.x.x.tgz file, the file is Hi3518 Software Development Kit.
+
+Wherein, Hi3518_V100R001SPC01xxx corresponds uclibc version, Hi3518_V100R001SPC02xxx corresponds glibc version.
+
+Decompression SDK package
+
+On linux server (or on a computer with linux the PC, the mainstream linux distribution can be), use the command: tar -zxf Hi3518_SDK_Vx.x.x.x.tgz decompress the file, you can get a Hi3518_SDK_Vx.x.x.x directory.
+
+Expand SDK package contents
+
+1) Before executing the installation script proposed changes to the default shell bash.
+
+2) Back Hi3518_SDK_Vx.x.x.x directory, run the source sdk.unpack (execute with root or sudo privileges) will launch the SDK package packing compression to store content, follow the prompts to complete the operation.
+
+If you need to transit through the WINDOWS operating system to copy the SDK package, please run source sdk.cleanup, put away the contents of the SDK package, and then copied to the new directory to start.
+
+Install cross compiler on linux server
+
+1) Install uclibc cross-compiler (note the need sudo privileges or root privileges):
+
+Enter Hi3518_SDK_Vx.x.x.x / osdrv / toolchain / arm-hisiv100nptl-linux directory, run chmod + x cross.install, then run ./cross.install can.
+
+2) Install glibc cross-compiler (note the need sudo privileges or root privileges):
+
+Enter Hi3518_SDK_Vx.x.x.x / osdrv / toolchain / arm-hisiv200-linux directory, run chmod + x cross.install, then run ./cross.install can.
+
+3) the implementation of source / etc / profile, install cross compiler script configuration environment variable can take effect, or re-landing also. CROSS_COMPILER_PATH = / opt / hisi-linux / x86-arm / arm-hisiv200-linux / target / bin
+
+Compile osdrv
+
+See osdrv directory readme
+
+SDK Contents Introduction
+
+Hi3518_SDK_Vx.x.x.x directory structure is as follows:
+
+| - Sdk.cleanup # SDK Cleanup Script
+  | - Sdk.unpack # SDK expand the script
+  | - Osdrv # storage operating system and associated drivers directory
+  | | - Busybox # busybox source code
+  | | - Drv # drv source code
+  | | - Kernel # linux kernel source code
+  | | - Pub # compiled mirror, tools, drv drivers, etc.
+  | | - Rootfs_scripts # rootfs source code
+  | | - Toolchain # cross compiler
+  | | - Tools # linux source code tool
+  | | - Uboot # uboot source code
+  | `- Makefile # osdrv Makefile
+  | - Package # SDK directory to store a variety of compression packages
+  | | - Osdrv.tgz # linux kernel / uboot / rootfs / tools source tarball
+  | | - Mpp.tgz # media processing platform software archive
+  | `- Image # FLASH programmer for the image file, such as the kernel, root file system
+  | - Scripts # storing shell scripts directory
+  | - Mpp # storage media processing platform directory
+      | - Component # assembly source code
+      | - Extdrv # board-level peripheral driver source code
+      | - Include # Foreign header
+      | - Ko # kernel module
+      | - Lib # release repository and audio library
+      | - Tools # media processing tools
+      `- Sample # sample source code
+
+Chapter 3 Installation, upgrade Hi3518DEMO board development Development Environment
+
+If Hi3518 DEMO board you use, you can program the u-boot, kernel and file system in accordance with the following procedure, use the following steps to update the network.
+Typically, you get the board already has programmed u-boot, if not, proposed to replace Flash with the u-boot.
+More detailed procedures and instructions, see 01.software \ board \ documents directory "Linux Development Environment User's Guide."
+The following operations assume your board have u-boot, use the Ethernet port programming uboot, kernel and rootfs into Flash.
+Demo board by default boot from SPI Flash.
+
+Tftp server configuration
+
+You can use any of the tftp server.
+If hi3518a, copy relevant documents package / image_uclibc_hi3518a (or image_glibc_hi3518a) down to the next tftp server directory.
+If hi3518c, copy relevant documents package / image_uclibc_hi3518c (or image_glibc_hi3518c) down to the next tftp server directory.
+If hi3516c, use the relevant documents package / image_uclibc_hi3516c (or image_glibc_hi3516c) directory mirror.
+Parameter Configuration
+
+After powering up the board, hit any key to enter the u-boot. Setting serverip (ie ip tftp server), ipaddr (veneer ip) and ethaddr (card MAC address).
+setenv serverip xx.xx.xx.xx
+setenv ipaddr xx.xx.xx.xx
+setenv ethaddr xx: xx: xx: xx: xx: xx
+setenv netmask xx.xx.xx.xx
+setenv gatewayip xx.xx.xx.xx
+ping serverip // ensure smooth network
+Writing image file to SPI Flash
+
+In Case 16M SPI Flash.
+
+1) address space Description

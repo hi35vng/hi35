@@ -1,0 +1,6 @@
+make ARCH=arm hi3518a_full_defconfig
+make ARCH=arm CROSS_COMPILER_PATH=/opt/hisi-linux-nptl/arm-hisiv100-linux/target/bin hi3518a_full_defconfig
+make clean
+make ARCH=arm CROSS_COMPILER_PATH=/opt/hisi-linux-nptl/arm-hisiv100-linux/target/bin
+
+export CROSS_COMPILER_PATH=/opt/hisi-linux-nptl/arm-hisiv100-linux/target/bin
