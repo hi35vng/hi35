@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0051)http://jsevy.com/linux/ARM_Linux_boot_sequence.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+  
+  
+
+  
+  
+  <title>ARM Linux Boot Sequence</title>
+  <meta content="J. Sevy" name="author">
+</head>
+
+
+<body>
+
+<h1>ARM Linux Boot Sequence</h1>
+
+
+The following traces the Linux boot sequence for ARM-based systems in
+the 2.6.18 kernel. It looks at just the earliest stages of the boot
+process, until the generic non-processor-specific start_kernel function
+is called. The
+line numbers of each statement are in parenthese at the end of the line; the kernel source itself
+can be conveniently browsed on the <a href="http://lxr.linux.no/">Linux Cross-Reference website</a>. <br>
+
+<br>
+
+<h2>zImage decompression</h2>
+
+<ul>
+
+  <li>arch/arm/boot/compressed/head.S: start (108)</li>
+
+  
+  <ul>
+
+    <li>First code executed, jumped to by the bootloader, at label "start" (108)</li>
+
+    <li>save contents of registers r1 and r2 in r7 and r8 to save off architecture ID and atags pointer passed in by bootloader (118)</li>
+
+    <li>execute arch-specific code&nbsp;(inserted at 146)</li>
+
+    
+    <ul>
+
+      <li>arch/arm/boot/compressed/head-xscale.S or other arch-specific code file</li>
+
+    
+    </ul>
+
+    
+    <ul>
+
+      <li>added to build in arch/arm/boot/compressed/Makefile</li>
+
+      <li>linked into head.S by linker section declaration:&nbsp; .section “start”</li>
+
+      <li>flush cache, turn off cache and MMU</li>
+
+    
+    </ul>
+
+    <li>load registers with stored parameters (152)</li>
+
+    
+    <ul>
+
+      <li>sp = stack pointer for decompression code (152)</li>
+
+      <li>r4 = zreladdr = kernel entry point physical address</li>
+
+    
+    </ul>
+
+    <li>check if running at link address, and fix up global offset table if not (196)</li>
+
+    <li>zero decompression bss (205)</li>
+
+    <li>call cache_on to turn on cache (218)</li>
+
+    
+    <ul>
+
+      <li>defined at arch/arm/boot/compressed/head.S (320)</li>
+
+      <li>call call_cache_fn to turn on cache as appropriate for processor variant</li>
+
+      
+      <ul>
+
+        <li>defined at arch/arm/boot/compressed/head.S (505)</li>
+
+        <li>walk through proc_types list (530) until find corresponding processor</li>
+
+        <li>call cache-on function in list item corresponding to processor (511)</li>
+
+        
+        <ul>
+
+          <li>for ARMv5tej core, cache_on function is __armv4_mmu_cache_on (417)</li>
+
+          
+          <ul>
+
+            <li>call setup_mmu to set up initial page tables since MMU must be on for cache to be on (419)</li>
+
+            <li>turn on cache and MMU (426)</li>
+
+          
+          </ul>
+
+        
+        </ul>
+
+      
+      </ul>
+
+    
+    </ul>
+
+    <li>check to make sure won't overwrite image during decompression; assume not for this trace (232)</li>
+
+    <li>call decompress_kernel to decompress kernel to RAM (277)</li>
+
+    <li>branch to call_kernel (278)</li>
+
+    
+    <ul>
+
+      <li>call cache_clean_flush to flush cache contents to RAM (484)</li>
+
+      <li>call cache_off to turn cache off as expected by kernel initialization routines (485)</li>
+
+      <li>jump to start of kernel in RAM (489)</li>
+
+      
+      <ul>
+
+        <li>jump to address in r4 = zreladdr from previous load</li>
+
+        
+        <ul>
+
+          <li>zreladdr = ZRELADDR = zreladdr-y</li>
+
+          <li>zreladdr-y specified in arch/arm/mach-vx115/Makefile.boot</li>
+
+        
+        </ul>
+
+      
+      </ul>
+
+    
+    </ul>
+
+  
+  </ul>
+
+</ul>
+
+<br>
+
+<h2>ARM-specific kernel code</h2>
+
+<ul>
+
+  <li>arch/arm/kernel/head.S: stext (72)</li>
+
+  
+  <ul>
+
+    <li>call __lookup_processor_type (76)</li>
+
+    
+    <ul>
+
+      <li>defined in arch/arm/kernel/head-common.S (146)</li>
+
+      <li>search list of supported processor types __proc_info_begin (176)</li>
+
+      
+      <ul>
+
+        <li>kernel may be built to support more than one processor type</li>
+
+        <li>list of proc_info_list structs&nbsp;</li>
+
+        
+        <ul>
+
+          <li>defined in arch/arm/mm/proc-arm926.S (467) and other corresponding proc-*.S files</li>
+
+        
+        </ul>
+
+        
+        <ul>
+
+          <li>linked into list by section declaration:&nbsp; .section ".proc.info.init"</li>
+
+        
+        </ul>
+
+      
+      </ul>
+
+      <li>return pointer to proc_info_list struct corresponding to processor if found, or loop in error if not</li>
+
+    
+    </ul>
+
+    <li>call __lookup_machine_type (79)</li>
+
+    
+    <ul>
+
+      <li>defined in arch/arm/kernel/head-common.S (194)</li>
+
+      <li>search list of supported machines (boards)</li>
+
+      
+      <ul>
+
+        <li>kernel may be built to support more than one board</li>
+
+        <li>list of machine_desc structs&nbsp;</li>
+
+        
+        <ul>
+
+          <li>machine_desc struct for boards defined in board-specific file vx115_vep.c</li>
+
+          <li>linked into list by section declaration that's part of MACHINE_DESC macro</li>
+
+        
+        </ul>
+
+      
+      </ul>
+
+      <li>return pointer to machine_desc struct corresponding to machine (board)</li>
+
+    
+    </ul>
+
+    <li>call __create_page_tables to set up initial MMU tables (82)</li>
+
+    <li>set lr to __enable_mmu, r13 to address of __switch_data (91, 93)</li>
+
+    
+    <ul>
+
+      <li>lr and r13 used for jumps after the following calls</li>
+
+      <li>__switch_data defined in arch/arm/kernel/head-common.S (15)</li>
+
+    
+    </ul>
+
+    <li>call the __cpu_flush function pointer in the previously returned proc_info_list struct (94)</li>
+
+    
+    <ul>
+
+      <li>offset is #PROCINFO_INITFUNC into struct</li>
+
+      <li>this function is __arm926_setup for the ARM 926EJ-S, defined in arch/arm/mm/proc-arm926.S (392)</li>
+
+      
+      <ul>
+
+        <li>initialize caches, writebuffer</li>
+
+      
+      </ul>
+
+    
+    </ul>
+
+    
+    <ul>
+
+      
+      <ul>
+
+        <li>jump to lr, previously set to address of __enable_mmu</li>
+
+      
+      </ul>
+
+    
+    </ul>
+
+    <li>__enable_mmu (147)</li>
+
+    
+    <ul>
+
+      <li>set page table pointer (TTB) in MMU hardware so it knows where to start page-table walks (167)</li>
+
+      <li>enable MMU so running with virtual addresses (185)</li>
+
+      <li>jump to r13, previously set to address of __switch_data, whose first field is address of __mmap_switched</li>
+
+      
+      <ul>
+
+        <li>__switch_data defined in arch/arm/kernel/head-common.S (15)</li>
+
+      
+      </ul>
+
+    
+    </ul>
+
+  
+  </ul>
+
+</ul>
+
+<br>
+
+<ul>
+
+  <li>arch/arm/kernel/head-common.S: __mmap_switched (35)</li>
+
+  
+  <ul>
+
+    <li>copy data segment to RAM (39)</li>
+
+    <li>zero BSS (45)</li>
+
+    <li>branch to start_kernel (55)</li>
+
+  
+  </ul>
+
+</ul>
+
+<br>
+
+<h2>Processor-independent kernel code</h2>
+
+<ul>
+
+  <li>init/main.c: start_kernel (456)</li>
+
+</ul>
+
+<br>
+
+
+
+</body></html>

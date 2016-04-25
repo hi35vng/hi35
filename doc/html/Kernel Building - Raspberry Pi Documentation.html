@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<!-- saved from url=(0066)https://www.raspberrypi.org/documentation/linux/kernel/building.md -->
+<html lang="en-GB"><!--<![endif]--><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <title>Kernel Building - Raspberry Pi Documentation</title>
+    <meta name="description" content="Explanation of some fundamental Linux usage and commands for getting around the Raspberry Pi and managing its filesystem and users">
+    <link rel="icon" type="image/png" href="https://www.raspberrypi.org/wp-content/themes/mind-control/images/favicon.png">
+    <link rel="publisher" href="https://plus.google.com/+RaspberryPi">
+    <!--[if lt IE 9]>
+    <script src="/wp-content/themes/mind-control/js/html5.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" href="./Kernel Building - Raspberry Pi Documentation_files/prism.css">
+    <link rel="stylesheet" href="./Kernel Building - Raspberry Pi Documentation_files/style.css">
+    <link rel="stylesheet" href="./Kernel Building - Raspberry Pi Documentation_files/mobile.css">
+    <link rel="stylesheet" href="./Kernel Building - Raspberry Pi Documentation_files/css">
+    <link rel="stylesheet" href="./Kernel Building - Raspberry Pi Documentation_files/css(1)">
+    <script type="text/javascript" async="" src="./Kernel Building - Raspberry Pi Documentation_files/ga.js"></script><script src="./Kernel Building - Raspberry Pi Documentation_files/jquery.min.js"></script>
+    <script src="./Kernel Building - Raspberry Pi Documentation_files/jquery.main.js"></script>
+    <script src="./Kernel Building - Raspberry Pi Documentation_files/prism.js"></script>
+
+    <script type="text/javascript">//<![CDATA[
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-46270871-1']);
+                        _gaq.push(['_trackPageview']);
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+        //]]></script>
+
+    <link rel="canonical" href="https://www.raspberrypi.org/">
+    <link rel="shortlink" href="https://www.raspberrypi.org/">
+</head>
+
+<body class="documentation">
+    <div class="container">
+        <header id="header">
+            <nav id="nav">
+                <ul id="menu-nav-bar" class="menu"><li id="menu-item-6901" class="home mobile menu-item menu-item-type-post_type menu-item-object-page current-menu-item page_item page-item-5372 current_page_item menu-item-6901"><a href="https://www.raspberrypi.org/">Home</a></li>
+                    <li id="menu-item-8279" class="close-menu menu-item menu-item-type-custom menu-item-object-custom menu-item-8279"><a href="https://www.raspberrypi.org/documentation/linux/kernel/building.md#">Close Menu</a></li>
+                    <li id="menu-item-6902" class="yellow menu-item menu-item-type-post_type menu-item-object-page menu-item-6902"><a href="https://www.raspberrypi.org/blog/">Blog</a></li>
+                    <li id="menu-item-6903" class="red menu-item menu-item-type-post_type menu-item-object-page menu-item-6903"><a href="https://www.raspberrypi.org/downloads/">Downloads</a></li>
+                    <li id="menu-item-6904" class="purple menu-item menu-item-type-post_type menu-item-object-page menu-item-6904"><a href="https://www.raspberrypi.org/community/">Community</a></li>
+                    <li id="menu-item-6905" class="green menu-item menu-item-type-post_type menu-item-object-page menu-item-6905"><a href="https://www.raspberrypi.org/help/">Help</a></li>
+                    <li id="menu-item-6907" class="pink menu-item menu-item-type-custom menu-item-object-custom menu-item-6907"><a href="https://www.raspberrypi.org/forums/">Forums</a></li>
+                    <li id="menu-item-18868" class="blue menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-18868"><a href="https://www.raspberrypi.org/education/">Education</a>
+                        <ul class="sub-menu">
+                            <li id="menu-item-6908" class="blue2 menu-item menu-item-type-post_type menu-item-object-page menu-item-6908"><a href="https://www.raspberrypi.org/resources/">Resources</a></li>
+                            <li id="menu-item-18869" class="blue3 menu-item menu-item-type-post_type menu-item-object-page menu-item-18869"><a href="https://www.raspberrypi.org/picademy/">Training</a></li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-7165" class="menu mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-7165"><a href="https://www.raspberrypi.org/documentation/linux/kernel/building.md#">Menu</a></li>
+                    <li id="menu-item-6912" class="search mobile menu-item menu-item-type-custom menu-item-object-custom menu-item-6912"><a href="https://www.raspberrypi.org/documentation/linux/kernel/building.md#">Search</a></li>
+                    <li id="menu-item-7154" class="shop menu-item menu-item-type-post_type menu-item-object-page menu-item-7154"><a href="https://www.raspberrypi.org/buy/">Buy</a></li>
+                </ul>
+            </nav>
+            <form class="search" action="https://www.raspberrypi.org/">
+                <input name="s" class="search" value="">
+                <input type="submit" class="submit" value="Search">
+            </form>
+        </header>
+
+        <div class="main">
+
+<nav class="breadcrumbs">
+    <a href="https://www.raspberrypi.org/documentation">documentation</a> &gt; <a href="https://www.raspberrypi.org/documentation/linux">linux</a> &gt; <a href="https://www.raspberrypi.org/documentation/linux/kernel">kernel</a> &gt; building</nav>
+
+<article class="entry-content">
+    <h1>Kernel Building</h1>
+<p>There are two main methods for building the kernel. You can build locally on a Raspberry Pi which will take a long time; or you can cross-compile, which is much quicker, but requires more setup.</p>
+<h2>Local building</h2>
+<p>On a Raspberry Pi first install the latest version of <a href="https://www.raspberrypi.org/downloads">Raspbian</a> from the downloads page. Then boot your Pi, plug in Ethernet to give you access to the sources, and log in.</p>
+<p>First get the sources, which will take some time:</p>
+<pre class=" language-bash"><code class=" language-bash">git clone <span class="token operator">--</span>depth<span class="token operator">=</span><span class="token number">1</span> https<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>github<span class="token punctuation">.</span>com<span class="token operator">/</span>raspberrypi<span class="token operator">/</span>linux</code></pre>
+<p>Add missing dependencies:</p>
+<pre class=" language-bash"><code class=" language-bash">sudo apt<span class="token operator">-</span>get install bc</code></pre>
+<p>Configure the kernel - as well as the default configuration you may wish to <a href="https://www.raspberrypi.org/documentation/linux/kernel/configuring.md">configure your kernel in more detail</a> or <a href="https://www.raspberrypi.org/documentation/linux/kernel/patching.md">apply patches from another source</a> to add or remove required functionality:</p>
+<p>Run the following commands depending on your Raspberry Pi version.</p>
+<h3>Raspberry Pi 1 (or Compute Module) Default Build Configuration</h3>
+<pre class=" language-bash"><code class=" language-bash">cd linux
+KERNEL<span class="token operator">=</span>kernel
+make bcmrpi_defconfig</code></pre>
+<h3>Raspberry Pi 2/3 Default Build Configuration</h3>
+<pre class=" language-bash"><code class=" language-bash">cd linux
+KERNEL<span class="token operator">=</span>kernel7
+make bcm2709_defconfig</code></pre>
+<p>Build and install the kernel, modules and Device Tree blobs; this step takes a <strong>long</strong> time...</p>
+<pre class=" language-bash"><code class=" language-bash">make <span class="token operator">-</span>j4 zImage modules dtbs
+sudo make modules_install
+sudo cp arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>dts<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>dtb <span class="token operator">/</span>boot<span class="token operator">/</span>
+sudo cp arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>dts<span class="token operator">/</span>overlays<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>dtb<span class="token operator">*</span> <span class="token operator">/</span>boot<span class="token operator">/</span>overlays<span class="token operator">/</span>
+sudo cp arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>dts<span class="token operator">/</span>overlays<span class="token operator">/</span>README <span class="token operator">/</span>boot<span class="token operator">/</span>overlays<span class="token operator">/</span>
+sudo scripts<span class="token operator">/</span>mkknlimg arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>zImage <span class="token operator">/</span>boot<span class="token operator">/</span><span class="token property">$KERNEL</span><span class="token punctuation">.</span>img</code></pre>
+<p>Note: On a Raspberry Pi 2/3, the <code>-j4</code> flag splits the work between all four cores, speeding up compilation significantly.</p>
+<h2>Cross-compiling</h2>
+<p>First you are going to require a suitable Linux cross-compilation host. We tend to use Ubuntu; since Raspbian is
+also a Debian distribution it means using similar command lines and so on.</p>
+<p>You can either do this using VirtualBox (or VMWare) on Windows, or install it directly onto your computer. For reference you can follow instructions online <a href="http://www.wikihow.com/Install-Ubuntu-on-VirtualBox">at Wikihow</a>.</p>
+<h3>Install toolchain</h3>
+<p>Use the following command:</p>
+<pre class=" language-bash"><code class=" language-bash">git clone https<span class="token punctuation">:</span><span class="token operator">/</span><span class="token operator">/</span>github<span class="token punctuation">.</span>com<span class="token operator">/</span>raspberrypi<span class="token operator">/</span>tools</code></pre>
+<p>You can then copy the toolchain to a common location such as <code>/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian</code>, and add <code>/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin</code> to your $PATH in the .bashrc in your home directory.
+For 64-bit host systems, use /tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin.
+While this step is not strictly necessary, it does make it easier for later command lines!</p>
+<h3>Get sources</h3>
+<p>To get the sources, refer to the original <a href="https://github.com/raspberrypi/linux">GitHub</a> repository for the various branches.</p>
+<pre><code>$ git clone --depth=1 https://github.com/raspberrypi/linux</code></pre>
+<h3>Build sources</h3>
+<p>To build the sources for cross-compilation there may be extra dependencies beyond those you've installed by default with Ubuntu. If you find you need other things please submit a pull request to change the documentation.</p>
+<p>Enter the following commands to build the sources and Device Tree files.</p>
+<p>For Pi 1 or Compute Module:</p>
+<pre class=" language-bash"><code class=" language-bash">cd linux
+KERNEL<span class="token operator">=</span>kernel
+make ARCH<span class="token operator">=</span>arm CROSS_COMPILE<span class="token operator">=</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>gnueabihf<span class="token operator">-</span> bcmrpi_defconfig</code></pre>
+<p>For Pi 2/3:</p>
+<pre class=" language-bash"><code class=" language-bash">cd linux
+KERNEL<span class="token operator">=</span>kernel7
+make ARCH<span class="token operator">=</span>arm CROSS_COMPILE<span class="token operator">=</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>gnueabihf<span class="token operator">-</span> bcm2709_defconfig</code></pre>
+<p>Then for both:</p>
+<pre class=" language-bash"><code class=" language-bash">make ARCH<span class="token operator">=</span>arm CROSS_COMPILE<span class="token operator">=</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>gnueabihf<span class="token operator">-</span> zImage modules dtbs</code></pre>
+<p>Note: To speed up compilation on multiprocessor systems, and get some improvement on single processor ones, use <code>-j n</code> where n is number of processors * 1.5. Alternatively, feel free to experiment and see what works!</p>
+<h3>Install directly onto the SD card</h3>
+<p>Having built the kernel you need to copy it onto your Raspberry Pi and install the modules; this is best done directly using an SD card reader.</p>
+<p>First use lsblk before and after plugging in your SD card to identify which one it is; you should end up with something like this:</p>
+<pre><code>sdb
+   sdb1
+   sdb2</code></pre>
+<p>If it is a NOOBS card you should see something like this:</p>
+<pre><code>sdb
+  sdb1
+  sdb2
+  sdb3
+  sdb5
+  sdb6</code></pre>
+<p>In the first case <code>sdb1/sdb5</code> is the FAT partition, and <code>sdb2/sdb6</code> is the ext4 filesystem image (NOOBS).</p>
+<p>Mount these first:</p>
+<pre class=" language-bash"><code class=" language-bash">mkdir mnt<span class="token operator">/</span>fat32
+mkdir mnt<span class="token operator">/</span>ext4
+sudo mount <span class="token operator">/</span>dev<span class="token operator">/</span>sdb1 mnt<span class="token operator">/</span>fat32
+sudo mount <span class="token operator">/</span>dev<span class="token operator">/</span>sdb2 mnt<span class="token operator">/</span>ext4</code></pre>
+<p>Adjust the partition numbers for the NOOBS images.</p>
+<p>Next, install the modules:</p>
+<pre class=" language-bash"><code class=" language-bash">sudo make ARCH<span class="token operator">=</span>arm CROSS_COMPILE<span class="token operator">=</span>arm<span class="token operator">-</span>linux<span class="token operator">-</span>gnueabihf<span class="token operator">-</span> INSTALL_MOD_PATH<span class="token operator">=</span>mnt<span class="token operator">/</span>ext4 modules_install</code></pre>
+<p>Finally, copy the kernel and Device Tree blobs onto the SD card, making sure to back up your old kernel:</p>
+<pre class=" language-bash"><code class=" language-bash">sudo cp mnt<span class="token operator">/</span>fat32<span class="token operator">/</span><span class="token property">$KERNEL</span><span class="token punctuation">.</span>img mnt<span class="token operator">/</span>fat32<span class="token operator">/</span><span class="token property">$KERNEL-backup</span><span class="token punctuation">.</span>img
+sudo scripts<span class="token operator">/</span>mkknlimg arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>zImage mnt<span class="token operator">/</span>fat32<span class="token operator">/</span><span class="token property">$KERNEL</span><span class="token punctuation">.</span>img
+sudo cp arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>dts<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>dtb mnt<span class="token operator">/</span>fat32<span class="token operator">/</span>
+sudo cp arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>dts<span class="token operator">/</span>overlays<span class="token operator">/</span><span class="token operator">*</span><span class="token punctuation">.</span>dtb<span class="token operator">*</span> mnt<span class="token operator">/</span>fat32<span class="token operator">/</span>overlays<span class="token operator">/</span>
+sudo cp arch<span class="token operator">/</span>arm<span class="token operator">/</span>boot<span class="token operator">/</span>dts<span class="token operator">/</span>overlays<span class="token operator">/</span>README mnt<span class="token operator">/</span>fat32<span class="token operator">/</span>overlays<span class="token operator">/</span>
+sudo umount mnt<span class="token operator">/</span>fat32
+sudo umount mnt<span class="token operator">/</span>ext4</code></pre>
+<p>Another option is to copy the kernel into the same place, but with a different filename - for instance, kernel-myconfig.img - rather than overwriting the kernel.img file. You can then edit the config.txt file to select the kernel that the Pi will boot into:</p>
+<pre><code>kernel=kernel-myconfig.img</code></pre>
+<p>This has the advantage of keeping your kernel separate from the kernel image managed by the system and any automatic update tools, and allowing you to easily revert to a stock kernel in the event that your kernel cannot boot.</p>
+<p>Finally, plug the card into the Pi and boot it!</p></article>
+
+                <footer class="licence">
+                    <aside class="octocat">
+                        <a href="https://github.com/raspberrypi/documentation/blob/master/linux/kernel/building.md"><img src="./Kernel Building - Raspberry Pi Documentation_files/octocat.jpg"></a>
+                    </aside>
+                    <aside class="links">
+                        <a href="https://github.com/raspberrypi/documentation/blob/master/linux/kernel/building.md" class="github">View/Edit this page on GitHub</a><br>
+                        <a href="https://www.raspberrypi.org/creative-commons/">Read our usage and contributions policy</a><br>
+                        <a href="https://www.raspberrypi.org/creative-commons/" class="cc"><img src="./Kernel Building - Raspberry Pi Documentation_files/88x31.png" alt="Creative Commons Licence"></a>
+                    </aside>
+                </footer>
+
+                <div style="clear: both;"></div>
+
+            </div>
+
+            <div style="clear: both;"></div>
+
+            <aside id="social-icons" class="footer">
+                <div class="footer-contents">
+                    <ul id="menu-social-icons" class="menu">
+                        <li id="menu-item-6924" class="twitter menu-item menu-item-type-custom menu-item-object-custom menu-item-6924"><a href="https://twitter.com/Raspberry_Pi">@Raspberry_Pi on Twitter</a></li>
+                        <li id="menu-item-6925" class="googleplus menu-item menu-item-type-custom menu-item-object-custom menu-item-6925"><a href="https://plus.google.com/+RaspberryPi">+RaspberryPi on Google+</a></li>
+                        <li id="menu-item-6926" class="facebook menu-item menu-item-type-custom menu-item-object-custom menu-item-6926"><a href="https://www.facebook.com/raspberrypi">Raspberry Pi on Facebook</a></li>
+                        <li id="menu-item-6927" class="github menu-item menu-item-type-custom menu-item-object-custom menu-item-6927"><a href="https://github.com/raspberrypi">Raspberry Pi on GitHub</a></li>
+                        <li id="menu-item-6928" class="githublearning menu-item menu-item-type-custom menu-item-object-custom menu-item-6928"><a href="https://github.com/raspberrypilearning">Raspberry Pi Learning on GitHub</a></li>
+                        <li id="menu-item-6929" class="youtube menu-item menu-item-type-custom menu-item-object-custom menu-item-6929"><a href="https://www.youtube.com/channel/UCFIjVWFZ__KhtTXHDJ7vgng">Raspberry Pi on YouTube</a></li>
+                        <li id="menu-item-6930" class="vimeo menu-item menu-item-type-custom menu-item-object-custom menu-item-6930"><a href="https://vimeo.com/raspberrypi">Raspberry Pi on Vimeo</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+        <footer id="footer">
+            <div class="footer-contents">
+                <ul id="menu-about-us" class="menu">
+                    <li id="menu-item-6888" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6888"><a href="https://www.raspberrypi.org/about/">About us</a></li>
+                    <li id="menu-item-6892" class="menu-item menu-item-type-post_type menu-item-object-help menu-item-6892"><a href="https://www.raspberrypi.org/help/faqs/">FAQs</a></li>
+                    <li id="menu-item-6893" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6893"><a href="https://www.raspberrypi.org/cookies/">Cookies</a></li>
+                    <li id="menu-item-6895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6895"><a href="https://www.raspberrypi.org/creative-commons/">Creative Commons</a></li>
+                    <li id="menu-item-6896" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6896"><a href="https://www.raspberrypi.org/trademark-rules/">Trademark rules</a></li>
+                    <li id="menu-item-6898" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6898"><a href="https://www.raspberrypi.org/contact-us/">Contact us</a></li>
+                </ul>
+
+                <footer>
+                    Raspberry Pi Foundation<br>
+                    UK registered charity 1129409
+                </footer>
+            </div>
+        </footer>
+    </div>
+
+
+</body></html>
