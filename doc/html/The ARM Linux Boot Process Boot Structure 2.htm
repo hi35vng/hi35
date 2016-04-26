@@ -1,0 +1,531 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0131)http://webcache.googleusercontent.com/search -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN" ""><HTML><HEAD><META 
+content="IE=5.0000" http-equiv="X-UA-Compatible">
+
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<STYLE type="text/css">body { margin-left:0;margin-right:0;margin-top:0; }#google-cache-hdr {background:#f5f5f5 !important;font:13px arial,sans-serif !important;text-align:left !important;color:#202020 !important;border:0 !important;margin:0 !important;border-bottom:1px solid #cecece !important;line-height:16px !important ;padding:16px 28px 24px 28px !important;}#google-cache-hdr * {display:inline !important;font:inherit !important;text-align:inherit !important;color:inherit !important;line-height:inherit !important;background:none !important;border:0 !important;margin:0 !important;padding:0 !important;letter-spacing:0 !important;}#google-cache-hdr a {text-decoration:none !important;color:#1a0dab !important;}#google-cache-hdr a:hover { text-decoration:underline !important; }#google-cache-hdr a:visited { color:#609 !important; }#google-cache-hdr div { display:block !important;margin-top:4px !important; }#google-cache-hdr b {font-weight:bold !important;display:inline-block !important;direction:ltr !important;}</STYLE>
+
+<META name="GENERATOR" content="MSHTML 10.00.9200.16750"></HEAD>
+<BODY>
+<DIV id="google-cache-hdr" dir="ltr">
+<DIV>This is Google's cache of <A dir="ltr" href="http://amitshah.bizhat.com/arm/arm_linux_boot-1.html">http://amitshah.bizhat.com/arm/arm_linux_boot-1.html</A>. 
+It is a snapshot of the page as it appeared on 25 Apr 2016 16:36:15 GMT. </DIV>
+<DIV>The <A dir="ltr" href="http://amitshah.bizhat.com/arm/arm_linux_boot-1.html">current 
+page</A> could have changed in the meantime. <A href="http://support.google.com/websearch/bin/answer.py?hl=en&amp;p=cached&amp;answer=1687222">Learn 
+more</A></DIV>
+<DIV></DIV>
+<DIV><SPAN style="margin-top: 8px !important; margin-right: 104px !important; display: inline-block !important; white-space: nowrap !important;"><SPAN 
+style="margin-right: 28px !important;"><SPAN style="font-weight: bold !important;">Full 
+version</SPAN></SPAN><SPAN style="margin-right: 28px !important;"><A href="http://webcache.googleusercontent.com/search?q=cache:_SoqJGqNBAIJ:amitshah.bizhat.com/arm/arm_linux_boot-1.html&amp;num=1&amp;hl=en&amp;strip=1&amp;vwsrc=0">Text-only 
+version</A></SPAN><SPAN style="margin-right: 28px !important;"><A href="http://webcache.googleusercontent.com/search?q=cache:_SoqJGqNBAIJ:amitshah.bizhat.com/arm/arm_linux_boot-1.html&amp;num=1&amp;hl=en&amp;strip=0&amp;vwsrc=1">View 
+source</A></SPAN></SPAN><SPAN style="color: rgb(113, 113, 113) !important; margin-top: 8px !important; display: inline-block !important;">Tip: 
+To quickly find your search term on this page, press <B>Ctrl+F</B> or <B>⌘-F</B> 
+(Mac) and use the find bar.</SPAN></DIV></DIV>
+<DIV style="position: relative;">
+<META name="GENERATOR" content="LinuxDoc-Tools 0.9.21">  <TITLE>The ARM Linux 
+Boot Process: Boot Structure</TITLE>  <LINK href="arm_linux_boot-2.html" rel="next"> 
+ <LINK href="arm_linux_boot.html#toc1" rel="contents"> <A href="http://amitshah.bizhat.com/arm/arm_linux_boot-2.html">Next</A>
+ Previous <A 
+href="http://amitshah.bizhat.com/arm/arm_linux_boot.html#toc1">Contents</A> 
+<HR>
+
+<H2><A name="s1">1.</A> <A href="http://amitshah.bizhat.com/arm/arm_linux_boot.html#toc1">Boot 
+Structure</A></H2>
+<P>The boot process for a machine is configured from the makefile located at: 
+linux/arch/arm/boot/Makefile</P>
+<H2><A name="ss1.1">1.1</A> <A href="http://amitshah.bizhat.com/arm/arm_linux_boot.html#toc1.1">boot/Makefile</A> 
+</H2>
+<P>This file normally defines the name of the kernel built, and some linker 
+specific options.</P>
+<P>This is the output of the build which is not in any specific binary / object 
+format that is executable. This is the raw kernel which can be used for 
+debugging or asm dumps. </P>
+<P>
+<PRE>SYSTEM = $(TOPDIR)/vmlinux
+</PRE>
+<P></P>
+<P>These variables decide the actually uncompressing of the kernel</P>
+<P>
+<PRE>ZTEXTADDR - Address where zImage is located by the bootloader 
+ZRELADDR - Address where the zImage will be relocated
+PARAMS_PHYS - Address where tagged parameters are to be found
+INITRD_PHYS - Physical Address of the Ramdisk
+ZBSSADDR - Address where the real kernel should execute from
+</PRE>
+<P></P>
+<P>To define these for a specific architecture, you would have:</P>
+<P>(these values are for the xScale PXA250)</P>
+<P>
+<PRE>ifeq($(CONFIG_ARCH_MYARCH),y)
+ZRELADDR = 0xA0008000
+PARAMS_PHYS = 0xA0000100
+endif
+</PRE>
+<P></P>
+<P>INITRD_PHYS and ZBSSADDR would depend on the actual architecture and 
+requirements, but these two parameters are vital to start any compressed zImage. 
+If you aren't using a compressed zImage, then you might still have to set 
+PARAMS_PHYS to setup tagged parameters.</P>
+<P>You will probably still be able to pass parameters through tags if you want 
+the kernel to locate a ramdisk.</P>
+<P>PARAMS_PHYS will point to the tagged parameters which have been placed by a 
+boot loader. </P>
+<H2><A name="ss1.2">1.2</A> <A href="http://amitshah.bizhat.com/arm/arm_linux_boot.html#toc1.2">boot/compressed/head-machine.S</A> 
+</H2>
+<P>For each machine type, there is a specific head-machine.S which sets machine 
+specific options. This could be head-xscale.S or head-netwinder.S or 
+head-sa1100.S or head-clps7500.S depending on the actual machine and is selected 
+through linux/arch/arm/boot/compressed/Makefile</P>
+<P>This is linked INTO head.S and not before head.S, it executes inside head.S 
+after some initial code is executed.</P>
+<H3>An Example: head-xscale.S</H3>
+<P>.start is defined here and is the actual execution start of the architecture 
+specific header. </P>
+<P>The next thing done is to flush the cache by traversing memory larger than 
+twice the largest possible size of a D-Cache (This technique seems to be used in 
+more than one place during the kernel start).</P>
+<P>Most of the code here is to switch on machine specific options, which 
+cannot/should not be included in head.S directly.</P>
+<P>
+<PRE>#ifdef CONFIG_ARCH_&lt;em&gt;MACHNAME
+r7 := #MACH_TYPE_&lt;em&gt;MACHNAME
+#endif
+</PRE>
+<P></P>
+<P>Optionally, the architecture id (MACH_TYPE_MACHNAME) is hardcoded inside the 
+decompresser. In case the bootloader (like Blob) can decompress the kernel from 
+itself, this would not be required as the entry code of the kernel can read the 
+architecture number from the registers passed to it. I assume that either the 
+initial registers passed to the decompresser will have to be preserved (the 
+boot-loader document specifies that we have to set r0 - 0, r1 - 
+MACH_TYPE_<EM>MACHNAME</EM>, r2 - PARAMS_PHYS). we now enter continue through 
+the common section of head.S (just after start:) </P>
+<H2><A name="ss1.3">1.3</A> <A href="http://amitshah.bizhat.com/arm/arm_linux_boot.html#toc1.3">linux/arch/arm/boot/compressed/head.S</A> 
+</H2>
+<P>This is the entry header for the kernel decompressing routine and is actually 
+located at: linux/arch/arm/boot/compressed/head.S</P>
+<H3>Debugging </H3>
+<P>The file actually starts with definitions for code required for debugging 
+(serial debugging) before the decompression actually starts.</P>
+<P><EM>#ifdef DEBUG</EM></P>
+<P>
+<UL>
+  <LI>raw serial debug functions are hard-coded into this file. They are used 
+  for printing messages during the decompression process much before control is 
+  transferred to the actual kernel.</LI>
+  <LI>serial functions are defined on the basis of two macros <EM>loadsp</EM>
+   and <EM>writeb</EM>. </LI>
+  <LI>the basic debugging macros are phex and putc which are provided as wrapped 
+  macros as kphex and kputc.</LI></UL>
+<P></P>
+<P>The following macros are used by kphex and kputc internally and need to be 
+defined should you need debugging support on the platform at this stage</P>
+<P>
+<UL>
+  <LI>writeb <EM>operand</EM>, writes a byte into the serial port</LI>
+  <LI>loadsp <EM>operand</EM>: operand must always be r3, if you want to use
+   writeb whose operand directly MUST NOT be r3. </LI>
+  <LI>loadsp places the base address for the serial port to r3, while writeb 
+  stores its operand into the right offset to the actual serial port.</LI>
+  <LI>loadsp probably means "load serial port" - it actually loads the serial 
+  port base address</LI>
+  <LI>writeb probably means "write byte" - this actually writes a byte into the 
+  serial port</LI></UL>
+<P></P>
+<P>
+<DL>
+  <DT><B>observation:</B>
+  <DD>
+  <P>this macro can be defined for any new architecture if you need debug 
+  messages before the kernel is uncompressed.</P></DD></DL>
+<P></P>
+<P>
+<UL>
+  <LI>there are two macros 'debug_reloc_start' and 'debug_reloc_end' defined on 
+  the basis of the prior macros. They are used to dump the process id</LI>
+  <LI>if you have these macros for the architecture you're working on, then you 
+  get the address where the kernel loads and a kernel dump. </LI></UL>
+<P></P>
+<P><EM>#endif /* DEBUG */</EM></P>
+<H3>Bootstrapping and Relocating</H3>
+<P>The actual code execution starts here:</P>
+<P>
+<DL>
+  <DT><B>start:</B>
+  <DD></DD></DL>
+<P></P>
+<P>
+<UL>
+  <LI>the bootloader has called the kernel zImage after placing 0 in r0 and the 
+  architecture number in r1, these values are now preserved. PS: we don't check 
+  if r0 was set as 0 out here, we just make an assumption and use only r1 
+  (preserving it for later use)</LI></UL>
+<P></P>
+<P>
+<PRE>.word 0x016f2818 @ Magic numbers to help the loader
+.word start @ absolute load/run zImage address 
+.word _edata @ zImage end address
+</PRE>
+<P></P>
+<P>"start" and "_edata" contain the offsets to start: and _edata: for the 
+zImage. They are intended to assist in relocating the kernel.</P>
+<P>0x016f2818 is a signature for boot loaders to identify the image as a linux 
+kernel zImage. This is at a physical offset 0x24 from the start of the actual 
+zImage and can be used to verify whether a given image is actually a compressed 
+linux kernel. In the case of a relocation, this would probably help a bootloader 
+detect a bootable zImage. We now preserve r0,r1 by storing them in r8,r7 so that 
+the scratch registers are available for manipulation through the rest of the 
+code.</P>
+<P>r8 = #0</P>
+<P>r7 = r1</P>
+<P>
+<UL>
+  <LI>r7 and r8 will be preserved henceforth and not be modified by any of the 
+  code that will uncompress the kernel! we could go ahead and play with r8 
+  (which is almost hardcoded as #0), but preserve r7 at all costs.</LI>
+  <LI>Some boot loaders (notably angel) do not set the SVC mode before entering, 
+  hence there is specific code to make sure that we are in supervisor mode 
+  before starting to uncompress the kernel. It is explicitly checked at this 
+  point. If we are not in SVC mode, we enter SVC mode here.</LI>
+  <LI>Machine specific code (like head-xscale.S or head-sa1100.S) is now 
+  executed HERE.</LI>
+  <LI>All machine specific initialization is completed at this point (this might 
+  include flushing data caches, setting any machine specific registers), and 
+  control returns here.</LI></UL>
+<P></P>
+<P>This part of the kernel is written to provide relocation capabilities. A GOT 
+(Global Offset Table) is defined and used for the purpose of relocation. At this 
+point, the code actually checks the GOT and makes sure that any offsets are 
+redefined if we are executing from a different location from what was expecetd. 
+</P>
+<P>The code works as follows:</P>
+<P>LC0 contains the GOT which can be used for relocating the code.</P>
+<P>
+<PRE>LC0: .word LC0 @ r1
+.word __bss_start @ r2
+.word _end @ r3
+.word _load_addr @ r4
+.word _start @ r5
+.word _got_start @ r6
+.word _got_end @ ip
+.word user_stack+4096 @ sp
+LC1: .word reloc_end - reloc_start
+</PRE>
+<P></P>
+<P>
+<UL>
+  <LI>Look for the GOT at where it should have been, if it is not found at this 
+  location, then find that offset to the actual GOT and store the new offset 
+  values to the GOT.</LI></UL>
+<P></P>
+<P>
+<DL>
+  <DT><B>note:</B>
+  <DD>
+  <P>r7,r8 are preserved during this operation (actually they are preserved 
+  almost through the rest of the code)</P></DD></DL>
+<P></P>
+<P>
+<UL>
+  <LI>This entire operation is to fixup C references. uncompress_kernel() and 
+  some of the functions used by it are actually C references and require the GOT 
+  to be setup and available before they can be used.  </LI>
+  <LI>at this point the GOT references have been fixed and the ip has also been 
+  fixed. </LI>
+  <LI>not_relocated:</LI>
+  <LI>all content from '_bss_start' to '_end' are filled with zeroes (0)</LI></UL>
+<P></P>
+<P>r2 = _bss_start, r3 = _end from the GOT</P>
+<P>
+<PRE>not_relocated: mov r0, #0
+1: str r0, [r2], #4 @ clear bss
+str r0, [r2], #4
+str r0, [r2], #4
+str r0, [r2], #4
+cmp r2, r3
+blo 1b
+</PRE>
+<P></P>
+<H3>Enabling the Cache (cache_on)</H3>
+<P>enable the cache now, do NOT touch r4 while doing so</P>
+<P>
+<PRE>set r3 := #8 
+</PRE>
+<P></P>
+<P>this is the offset to find the cache_on routine from the processor cache 
+entry tables. (refer to the processor_info table below - ptr_cache_on is at 
+offset #8)</P>
+<P>
+<PRE>call call_cache_fn 
+</PRE>
+<P></P>
+<P>this routine actually chooses which cache functions to run based on the 
+processor id and the offset supplied (r3). </P>
+<P>The <EM>proc_types</EM> table is laid out as follows:</P>
+<P>for each processor there is an identical record that lists out</P>
+<P>| proc_types |</P>
+<P>- processor_id -</P>
+<P>- processor_mask -</P>
+<P>- ptr_cache_on -</P>
+<P>- { return mov pc,lr } -</P>
+<P>the last record is</P>
+<P>- 0 -</P>
+<P>- 0 -</P>
+<P>- { mov pc, lr } -</P>
+<P>- { mov pc, lr } -</P>
+<P>- { return mov pc,lr } -</P>
+<P>As observed, the last record would forcibly return to the caller (and 
+initiate an error indicating that the processor was not identified).</P>
+<P>the appropriate cache function [ptr_cache_on] is called by a direct branch 
+(without modifying the link register lr)</P>
+<P>
+<PRE>set r12 := lr
+</PRE>
+<P></P>
+<P>
+<DL>
+  <DT><B>PS:</B>
+  <DD>
+  <P>every arch specific cache_on preserves lr by copying it to r12. It may be 
+  possible that lr is affected when the cache is initialized**</P></DD></DL>
+<P></P>
+<P>( the cache function finally returns with a mov pc,r12 )</P>
+<H3>Decompress the kernel</H3>
+<P>
+<UL>
+  <LI>this depends on the fact that r4, r5 were preserved through all previous 
+  routines (after relocating, reading in the GOT).</LI>
+  <LI>we need to create space for a kernel before decompressing it, that is done 
+  by allocating stack space and ensuring that we don't run into the kernel while 
+  doing so.</LI></UL>
+<P></P>
+<P>
+<PRE>r1 := sp
+r2 := sp + 64K
+if r4 &gt; r2 &lt;em&gt;(_load_addr &gt; sp+64K)? do wont_overwrite()
+r0 := r4 + 4M
+if r0 &lt; r5 &lt;em&gt;(_load_addr + 4M &lt; _start)? do wont_overwrite()
+</PRE>
+<P></P>
+<P>In case we run into the kernel (within our stack space), we need to 
+workaround overwriting the kernel on decompression </P>
+<P>
+<PRE>r1 := r5 + r0 (_start + _length) - _end of kernel
+r2 := _start
+r3 := *LC1 (reloc_end - reloc_start)
+r3 := r2 + r3 (_start + reloc_length)
+copy relocation code from _start to _end
+</PRE>
+<P></P>
+<P>parameters to decompress_kernel() are now assigned before calling</P>
+<P>
+<PRE>r5 := r2 (sp +64K)
+r0 := r5 (sp +64K)
+r3 := r7 (r7 = architecture_id)
+decompress_kernel()
+</PRE>
+<P></P>
+<P><B>wont_overwrite()</B> is called when it is safe to proceed with the initial 
+addresses and stack space assignments. This is the ideal case and the simplest 
+one with no complications.</P>
+<P>
+<PRE>r0 := r4 ( _load_addr of kernel )
+r3 := r7 ( architecture_id )
+decompress_kernel()
+call_kernel()
+</PRE>
+<P></P>
+<P>decompress_kernel() is actually a C routine (there is a comment where the GOT 
+is setup, stating that the GOT is required to be properly setup for accessing C 
+calls).</P>
+<H3>Call Kernel</H3>
+<P>
+<PRE>do cache_clean_flush() -- flush the caches softly!
+do cache_off() -- turn off all caches
+r0 := #0
+r1 := r7 (architecture_id)
+mov pc, r4 (r4 = _load_addr)
+</PRE>
+<P></P>
+<P>The kernel should start executing at this point (you'll have to refer to code 
+in kernel/head.S to trace further execution).</P>
+<H3>Notes</H3>
+<P><B>Flushing the D-Cache</B></P>
+<P><EM>cache_clean_flush()</EM></P>
+<P>
+<PRE>r1 := pc &amp; ~(31) /** bic r1, pc, #31 */
+r2 := r1 + 64K (64K is twice the size of 32K - max d-cache size)
+while( r1 &lt; r2) {
+r12 = *r1
+r1 += 8
+}
+</PRE>
+<P></P>
+<P>
+<UL>
+  <LI>this traversal of memory twice the size of the maximum possible d-cache 
+  (which is 32K) is supposed to ensure a complete flush of the d-cache. </LI></UL>
+<P></P>
+<H2><A name="ss1.4">1.4</A> <A href="http://amitshah.bizhat.com/arm/arm_linux_boot.html#toc1.4">kernel/head.S</A> 
+</H2>
+<P>This is the actual start of the kernel (sans any decompression code).</P>
+<P>(was head-arm[vo].S in 2.4.xx kernels and has now been merged into a single 
+file.)</P>
+<P>
+<UL>
+  <LI>The file starts with a check (TEXT_ADDR &amp; 0xffff) != 0x8000  </LI>
+  <LI>This is because the page tables are placed 16K below the actual text 
+  address and we need to have at least that much space ensured. Though 0x8000 is 
+  32K, this option may be relaxed to PAGE_OFFSET + 0x4000 in the future.</LI></UL>
+<P></P>
+<P>(PS: This is why all TEXTADDR end with 0x8000)</P>
+<P>ENTRY(stext) in this file actually executes from TEXTADDR</P>
+<P>At this point, the following state is assumed</P>
+<HR>
+<EM>MMU: off</EM> 
+<HR>
+
+<HR>
+<EM>I-Cache: - don't bother -</EM> 
+<HR>
+
+<HR>
+<EM>D-Cache: off</EM> 
+<HR>
+
+<HR>
+<EM>r0: 0</EM> 
+<HR>
+
+<HR>
+<EM>r1: architecture_id (sourced from mach-types)</EM> 
+<HR>
+
+<P>This code can also be called by a bootloader (which can uncompress the kernel 
+by itself or run an uncompressed kernel image) and hence should also be able to 
+execute without any special settings or helpers.</P>
+<H3>ENTRY(stext)</H3>
+<P>We now force ourselves to enter SVC mode irrespective of the mode we are in 
+during entry.</P>
+<P>(set CPSR_C using r0 - saving original r0 to r12)</P>
+<P>CPSR_C := PSR_F_BIT | PSR_I_BIT | MODE_SVC</P>
+<P>enter SVC mode with FIQs and IRQs turned off</P>
+<H3>lookup_processor_type()</H3>
+<P>
+<UL>
+  <LI>this identifies the processor and points to the base of a table that 
+  contains a list of magic numbers and functions specific to a given processor 
+  type. The table used here is like the proc_types table, though not identical 
+  and serves a similar purpose.</LI>
+  <LI>we have access to a table with pointers to the actual proc_info record. 
+  The actual structures can be found at arch/arm/mm/proc-*.S</LI>
+  <LI>These are filled up by the linker script arch/arm/vmlinux*.lds with 
+  entries from arch/arm/mm/proc-$(PROCESSOR).S</LI></UL>
+<P></P>
+<P>
+<DL>
+  <DT><B>__proc_info_end</B>
+  <DD>
+  <DT><B>__proc_info_begin</B>
+  <DD>
+  <DT><B>[table]</B>
+  <DD>
+  <DT><B>__arch_info_begin</B>
+  <DD>
+  <DT><B>__arch_info_end</B>
+  <DD></DD></DL>
+<P></P>
+<HR>
+<EM>r5 := &amp;__proc_info_end (actually the start of the table).</EM> 
+<HR>
+
+<HR>
+<EM>using r5 it loads the following</EM> 
+<HR>
+
+<HR>
+<EM>r7 := __proc_info_end</EM> 
+<HR>
+
+<HR>
+<EM>r9 := __proc_info_begin</EM> 
+<HR>
+
+<HR>
+<EM>r10:= [table]</EM> 
+<HR>
+
+<P>
+<UL>
+  <LI>it converts these addresses to our address space (relocates them if 
+  necessary).</LI>
+  <LI>r10 finally contains a pointer to the first available processor_id in the 
+  table</LI></UL>
+<P></P>
+<P>It traverses the table, the first two entries in the table are</P>
+<P>[processor_id]</P>
+<P>[mask]</P>
+<P>It uses </P>
+<P>
+<PRE>mrc p15, 0, r9, c0, c0 @ get processor id
+r6 := processor_mask &amp; r9
+if ( r6 == processor_id ) { return; }
+</PRE>
+<P></P>
+<P>at this point r10 := _proc_info or '0' depending on whether a match was made. 
+We can easily check whether the processor was identified by checking the value 
+of r10.</P>
+<P>
+<PRE>if( r10 == 0 ) { exit( err = 'p' ) }
+</PRE>
+<P></P>
+<H3>lookup_architecture_type()</H3>
+<P>This uses the value of r1 that was passed through to identify the actual 
+machine type. It parses through a table just like __lookup_processor_type() till 
+it hits a match.</P>
+<P>This returns:</P>
+<P>r5 := Physical Start Address of RAM</P>
+<P>r6 := Physical Start Address of I/O</P>
+<P>r7 := byte offset into page tables for I/O</P>
+<P>Again, we can check whether we had a positive identification by checking 
+r7.</P>
+<P>if( r7 == 0 ) { exit( err = 'a' ) }</P>
+<H3>create_page_tables()</H3>
+<P>The page tables are located at address of 'stext' - 0x4000 this is exactly 
+16k below the actual start of the kernel.</P>
+<P>This is done using the <B>pgtbl</B> macro which takes an extra rambase
+ parameter that is never used**. The entire 0x4000 (16K) 1 level table is 
+cleared with '0's 4 MB of space is mapped as pages of 1 MB each and the rest is 
+aligned on a 32MB boundary. If a serial debug is required before paging_init() 
+is called, the serial device (if it is external to the processor) also must be 
+mapped through this table. If the serial device is through the processor, then 
+you would have to know the virtual address of the serial device after the 
+initial page mapping is done. CONFIG_DEBUG_LL selects whether the serial device 
+is mapped here. There are certain architecture specific initialization code 
+required here if serial debugging on an external UART is required.</P>
+<P>lr = &amp;<EM>__turn_mmu_on()</EM></P>
+<P>
+<DL>
+  <DT><B>Note:</B>
+  <DD>
+  <P>This was __ret() in 2.4.xx</P></DD></DL>
+<P></P>
+<P>The adr psuedo-op is used here to ensure that the code remains completely 
+relocatable. r10 contains the base address of 'xxx_proc_info' table where xxx is 
+the processor identified by __lookup_processor_type().</P>
+<P>
+<PRE>pc = r10 + #12
+</PRE>
+<P></P>
+<P>this actually jumps to ___xxx_setup()</P>
+<P>The MMU is setup at this point and activated. (the lr actually points to 
+__turn_mmu_on(), and hence mov pc,lr jumps there). Once the MMU is setup, 
+control will now be passed to __mmap_switched.</P>
+<H3>mmap_switched()</H3>
+<P>This is the last function called inside head.S after which control is passed 
+to 'start_kernel' (which is located in entry-arm[vo].S)</P>
+<HR>
+<A href="http://amitshah.bizhat.com/arm/arm_linux_boot-2.html">Next</A> Previous 
+<A href="http://amitshah.bizhat.com/arm/arm_linux_boot.html#toc1">Contents</A> 
+</DIV></BODY></HTML>

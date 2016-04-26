@@ -12,3 +12,16 @@ For RASPBERRY PI 2/3 DEFAULT BUILD CONFIGURATION
 	sudo scripts/mkknlimg arch/arm/boot/zImage /boot/$KERNEL.img
 	reboot
 	uname -a
+	
+	export PATH=/home/haohd/git/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin:/usr/lib/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/home/haohd/bin
+	make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcmrpi_defconfig
+	make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage modules dtbs
+
+	
+	make O=/home/haohd/workspace/rpi/output ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- bcmrpi_defconfig
+	make O=/home/haohd/workspace/rpi/output ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage modules dtbs
+	make O=/home/haohd/workspace/rpi/output ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- zImage
+	make O=/home/haohd/workspace/rpi/output ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- clean
+	date -s "26 APR 2016 9:36:59"
+	
+	[haohd@localhost gcc-linaro-arm-linux-gnueabihf-raspbian]$ ls /tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnu
